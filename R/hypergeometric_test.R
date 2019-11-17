@@ -57,7 +57,7 @@ pathway_analysis <- function(sig.genes,class=c("mmu","hsa","gga")){
 
   sig.genes <- unique(intersect(sig.genes,all.genes))
   print(paste("sig genes in pathway:",length(sig.genes)))
-  out <- mclapply(path.gene,function(x){
+  out <- parallel::mclapply(path.gene,function(x){
     if(!is.na(x)){
       symbol <- na.omit(x[,1])
       symbol = symbol[!symbol==""]
