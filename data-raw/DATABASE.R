@@ -1,4 +1,5 @@
 ## code to prepare `DATABASE` dataset goes here
+#usethis::use_data("DATABASE")
 ################### mart #######################
 mmu_mart <- readRDS("data-raw/mart_mmu.rds")
 usethis::use_data(mmu_mart, overwrite = TRUE)
@@ -39,4 +40,3 @@ usethis::use_data(hsa_path_gene_list, overwrite = TRUE)
 hsa_genes_pathways <- utils::read.csv("data-raw/genes_pathways_hsa.csv")
 usethis::use_data(hsa_genes_pathways, overwrite = TRUE)
 
-usethis::use_data("DATABASE")
