@@ -1,0 +1,56 @@
+---
+title: "Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+## This package
+```{r setup}
+library(quickpath)
+
+#head(gene_exp.diff)
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu")
+#head(deg)
+sig.genes = deg$external_gene_name
+path_res = pathway_analysis(sig.genes, class = "mmu")
+pathway <- c("Purine metabolism", "PI3K-Akt signaling pathway", "AMPK signaling pathway", "Choline metabolism in cancer")
+deg.list = extract_degs_by_pathway(pathway, deg, class = "mmu")
+```
+
+```{r}
+deg_chow = grab_deg_from_cuffdiff(gene_exp.diff_chow, class = "mmu")
+sig.genes = deg_chow$external_gene_name
+path_res_chow = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e105 = grab_deg_from_cuffdiff(gene_exp.diff_e105, class = "mmu")
+sig.genes = deg_e105$external_gene_name
+path_res_e105 = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e95 = grab_deg_from_cuffdiff(gene_exp.diff_e95, class = "mmu")
+sig.genes = deg_e95$external_gene_name
+path_res_e95 = pathway_analysis(sig.genes, class = "mmu")
+
+deg_egg = grab_deg_from_cuffdiff(gene_exp.diff_egg, class = "gga")
+sig.genes = deg_egg$external_gene_name
+path_res_egg = pathway_analysis(sig.genes, class = "gga")
+```
+
+```{r}
+list.info = list(path_res[[2]], path_res_chow[[2]], path_res_e95[[2]], path_res_e105[[2]])
+path.ids = check_pathway_name(pathway, class = "mmu")
+group.info = c("MCD","Chow","E9.5","E10.5")
+path.names = c("1st path","2nd path","3rd path","4th path")
+fig_path(path.ids, list.info, group.info, criterion = "percentage", path.names = path.names)
+fig_path(path.ids, list.info, group.info, criterion = "pval", path.names = path.names)
+
+
+```
