@@ -1,66 +1,111 @@
-#' title
+#' A line chart for pathways' over-representation level
 #'
-#'@param
-#'@param
-#'@return
+#'@param path.ids Interested pathway ids
+#'@param list.info A list which contains pathway analysis results for all interested groups
+#'@param group.info A vector of group names
+#'@param criterion Plot is for p value or percentage of DEGs in each pathway
+#'@param out.name If specified, the plot will be saved in this file
+#'@param path.names It will be used in xlab, if not specified, will use the full name.
+#'@return NULL
 #'@examples
-#'eg
+#' deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu")
+#' head(deg)
+#' sig.genes = deg$external_gene_name
+#' path_res = pathway_analysis(sig.genes, class = "mmu")
+#' deg_chow = grab_deg_from_cuffdiff(gene_exp.diff_chow, class = "mmu")
+#' sig.genes = deg_chow$external_gene_name
+#' path_res_chow = pathway_analysis(sig.genes, class = "mmu")
+#'
+#' deg_e95 = grab_deg_from_cuffdiff(gene_exp.diff_e95, class = "mmu")
+#' sig.genes = deg_e95$external_gene_name
+#' path_res_e95 = pathway_analysis(sig.genes, class = "mmu")
+#'
+#' deg_e105 = grab_deg_from_cuffdiff(gene_exp.diff_e105, class = "mmu")
+#' sig.genes = deg_e105$external_gene_name
+#' path_res_e105 = pathway_analysis(sig.genes, class = "mmu")
+#'
+#' list.info = list(path_res[[2]], path_res_chow[[2]], path_res_e95[[2]], path_res_e105[[2]])
+#' path.ids = check_pathway_name(pathway, class = "mmu")
+#' group.info = c("MCD","Chow","E9.5","E10.5")
+#' path.names = c("1st path","2nd path","3rd path","4th path")
+#'
+#' fig_path(path.ids, list.info, group.info, criterion = "percentage", path.names = path.names)
+#' fig_path(path.ids, list.info, group.info, criterion = "pval", path.names = path.names)
+
 #'@export
-fig_path <- function(path.target,out.name,list.info){
+fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","percentage"),
+                     out.name = NULL,
+                     path.names = NULL,
+                     width=2000, height=2400, res=216){
 
-  library(ggplot2)
+  n = length(list.info)
+  dta.list <- list()
+  for(i in 1:n){
+    tmp.info = list.info[[i]]
+    tmp.dta = tmp.info[tmp.info$name %in% path.ids, c("path", criterion)]
 
-  path.target <- c("path:mmu00562",
-                   "path:mmu00564",
-                   "path:mmu04070",
-                   "path:mmu04072",
-                   "path:mmu04151")
+    if(is.null(path.names)){
+      tmp.dta$path = unlist(strsplit(tmp.dta$path," - M"))[seq(1,2*length(path.ids),2)]
+    }
+    else{
+      tmp.dta$path = path.names
+    }
 
-  path.info1 <- read.csv("../results/HFvsNF_meth_all.csv",stringsAsFactors = FALSE)
-  path.info2 <- read.csv("../results/H2SvsHF_meth_all.csv",stringsAsFactors = FALSE)
+    if(criterion == "percentage"){
+      tmp.dta[,2] = tmp.dta[,2] * 100
+    }
+    else{
+      tmp.dta[,2] = -log(tmp.dta[,2])
+    }
 
-  tmp1 <- path.info1[path.info1$name%in% path.target,c(1:2,5)]
-  dta1<- tmp1[,2:3]
-  dta1$path <- unlist(strsplit(tmp1$path," - M"))[seq(1,2*length(path.target),2)]
-  names(dta1)[1] <- "Pathway"
-  dta1$percentage = dta1$percentage * 100
-  dta1$type = "HF vs. NF"
+    tmp.dta$type = group.info[i]
+    dta.list[[i]] = tmp.dta
+  }
 
-  tmp2 <- path.info2[path.info2$name%in% path.target,c(1:2,5)]
-  dta2<- tmp2[,2:3]
-  dta2$path <- unlist(strsplit(tmp2$path," - M"))[seq(1,2*length(path.target),2)]
-  names(dta2)[1] <- "Pathway"
-  dta2$percentage = dta2$percentage * 100
-  dta2$type = "H2S vs. HF"
+  final.dta = do.call("rbind", dta.list)
+  final.dta$path = factor(final.dta$path)
+  final.dta$type = factor(final.dta$type, levels = group.info)
+  limit = max(final.dta[,2]+10)
 
-  path.info3 <- read.csv("../results/H2SvsNF_meth_all.csv",stringsAsFactors = FALSE)
-  tmp3 <- path.info3[path.info3$name%in% path.target,c(1:2,5)]
-  dta3<- tmp3[,2:3]
-  dta3$path <- unlist(strsplit(tmp3$path," - M"))[seq(1,2*length(path.target),2)]
-  names(dta3)[1] <- "Pathway"
-  dta3$percentage = dta3$percentage * 100
-  dta3$type = "H2S vs. NF"
+  if(criterion == "percentage"){
+    fig <- ggplot(data=final.dta, aes(x=path,y=percentage,group=type,colour=type,linetype=type,shape=type)) +
+      geom_line()+
+      geom_point(size=1.5)+
+      scale_y_continuous(limits=c(0,limit),breaks = c(seq(0,limit,5)),
+                         labels = c(paste(seq(0,limit,5),"%",sep="")))+
+      labs(x = "Pathway", y = "Percentage") +
+      scale_color_manual("Comparison", values=as.character(1:n))+
+      scale_linetype_manual("Comparison",
+                            values = 1:n)+
+      scale_shape_manual("Comparison",
+                         values = 15:(14+n))+
+      theme(text = element_text(size=20,face="bold"),
+            axis.text.x=element_text(angle=75, hjust=1,vjust=1,size = 20,face="bold"),
+            axis.text.y = element_text(face="bold", size=20))
+  }
+  else{
+    fig <- ggplot(data=final.dta, aes(x=path,y=pval,group=type,colour=type,linetype=type,shape=type)) +
+      geom_line()+
+      geom_point(size=1.5)+
+      scale_y_continuous(limits=c(0,limit),breaks = c(-log(0.05),seq(0,limit,5),limit+5),
+                         labels = c("-log(0.05)",seq(0,limit,5),"Inf"))+
+      labs(x = "Pathway", y = "-log pvalue") +
+      scale_color_manual("Comparison", values=as.character(1:n))+
+      scale_linetype_manual("Comparison",
+                            values = 1:n)+
+      scale_shape_manual("Comparison",
+                         values = 15:(14+n))+
+      geom_hline(yintercept = -log(0.05),lty=2)+
+      theme(text = element_text(size=20,face="bold"),
+            axis.text.x=element_text(angle=75, hjust=1,vjust=1,size = 20,face="bold"),
+            axis.text.y = element_text(face="bold", size=20))
+  }
 
-  dat <- rbind(dta1,dta2,dta3)
-  #dat <- data.frame(Pathway = rep(sel.kegg.names,2), pval = c(out[,1],out[,2]),type=rep(c("HF vs NF","H9N vs NF"),each= nrow(out)))
-  dat$Pathway = factor(dat$Pathway,levels = unique(dat$Pathway)[c(2,5,1,3,4)])
-  dat$type <- factor(dat$type,levels = unique(dat$type))
+  print(fig)
 
-  tiff("../figures/percentage_3comparisons_pathway.tiff", width=2000, height=2400, res=216)
-  ggplot(data=dat, aes(x=Pathway,y=percentage,group=type,colour=type,linetype=type,shape=type)) +
-    geom_line()+
-    geom_point(size=1.5)+
-    scale_y_continuous(breaks = c(seq(0,40,5)),
-                       labels = c(paste(seq(0,40,5),"%",sep="")))+
-    labs(x = "Pathway", y = "Percentage") +
-    scale_color_manual("Comparison", values=c("1","2","blue"))+
-    scale_linetype_manual("Comparison",
-                          values = c(1,2,3))+
-    scale_shape_manual("Comparison",
-                       values = c(15,16,17))+
-    #  scale_x_discrete(labels=c())+
-    theme(text = element_text(size=20,face="bold"),
-          axis.text.x=element_text(angle=75, hjust=1,vjust=1,size = 20,face="bold"),
-          axis.text.y = element_text(face="bold", size=20))
-  dev.off()
+  if(!is.null(out.name)){
+    tiff(out.name, width=width, height=height, res=res)
+    print(fig)
+    dev.off()
+  }
 }
