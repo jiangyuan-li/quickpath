@@ -6,6 +6,9 @@
 #'@param criterion Plot is for p value or percentage of DEGs in each pathway
 #'@param out.name If specified, the plot will be saved in this file
 #'@param path.names It will be used in xlab, if not specified, will use the full name.
+#'@param width parameter width when saving plot
+#'@param height parameter height when saving plot
+#'@param res parameter res when saving plot
 #'@return NULL
 #'@examples
 #' deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu")
@@ -37,20 +40,29 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
                      out.name = NULL,
                      path.names = NULL,
                      width=2000, height=2400, res=216){
+  # loading ggplot2
+  library(ggplot2)
 
+  # get number of groups
   n = length(list.info)
+
+  # prepare date for each result of pathway analysis
   dta.list <- list()
   for(i in 1:n){
+
+    # grab data based criterion
     tmp.info = list.info[[i]]
     tmp.dta = tmp.info[tmp.info$name %in% path.ids, c("path", criterion)]
 
     if(is.null(path.names)){
+      # prepare names on xlab
       tmp.dta$path = unlist(strsplit(tmp.dta$path," - M"))[seq(1,2*length(path.ids),2)]
     }
     else{
       tmp.dta$path = path.names
     }
 
+    # reformat numbers
     if(criterion == "percentage"){
       tmp.dta[,2] = tmp.dta[,2] * 100
     }
@@ -58,16 +70,25 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
       tmp.dta[,2] = -log(tmp.dta[,2])
     }
 
+    # assign group info
     tmp.dta$type = group.info[i]
+
     dta.list[[i]] = tmp.dta
   }
 
+  # aggregate the list of data frames
   final.dta = do.call("rbind", dta.list)
-  final.dta$path = factor(final.dta$path)
+
+  # change type of path and type
+  final.dta$path = factor(final.dta$path, levels = final.dta$path[1:nrow(tmp.dta)])
   final.dta$type = factor(final.dta$type, levels = group.info)
+
+  # set ylim
   limit = max(final.dta[,2]+10)
 
   if(criterion == "percentage"){
+
+    # get plot
     fig <- ggplot(data=final.dta, aes(x=path,y=percentage,group=type,colour=type,linetype=type,shape=type)) +
       geom_line()+
       geom_point(size=1.5)+
@@ -84,6 +105,8 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
             axis.text.y = element_text(face="bold", size=20))
   }
   else{
+
+    # get plot using ggplot2 using ggplot2
     fig <- ggplot(data=final.dta, aes(x=path,y=pval,group=type,colour=type,linetype=type,shape=type)) +
       geom_line()+
       geom_point(size=1.5)+
@@ -101,11 +124,15 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
             axis.text.y = element_text(face="bold", size=20))
   }
 
+  # show plot
   print(fig)
 
   if(!is.null(out.name)){
+    # saving plot
     tiff(out.name, width=width, height=height, res=res)
     print(fig)
     dev.off()
   }
+
+  # no return
 }

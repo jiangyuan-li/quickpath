@@ -2,16 +2,64 @@
 % Please edit documentation in R/fig_path_ggplot2.R
 \name{fig_path}
 \alias{fig_path}
-\title{title}
+\title{A line chart for pathways' over-representation level}
 \usage{
-fig_path(path.target, out.name, list.info)
+fig_path(
+  path.ids,
+  list.info,
+  group.info,
+  criterion = c("pval", "percentage"),
+  out.name = NULL,
+  path.names = NULL,
+  width = 2000,
+  height = 2400,
+  res = 216
+)
 }
-\value{
+\arguments{
+\item{path.ids}{Interested pathway ids}
 
+\item{list.info}{A list which contains pathway analysis results for all interested groups}
+
+\item{group.info}{A vector of group names}
+
+\item{criterion}{Plot is for p value or percentage of DEGs in each pathway}
+
+\item{out.name}{If specified, the plot will be saved in this file}
+
+\item{path.names}{It will be used in xlab, if not specified, will use the full name.}
+
+\item{width}{parameter width when saving plot}
+
+\item{height}{parameter height when saving plot}
+
+\item{res}{parameter res when saving plot}
 }
 \description{
-title
+A line chart for pathways' over-representation level
 }
 \examples{
-eg
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu")
+head(deg)
+sig.genes = deg$external_gene_name
+path_res = pathway_analysis(sig.genes, class = "mmu")
+deg_chow = grab_deg_from_cuffdiff(gene_exp.diff_chow, class = "mmu")
+sig.genes = deg_chow$external_gene_name
+path_res_chow = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e95 = grab_deg_from_cuffdiff(gene_exp.diff_e95, class = "mmu")
+sig.genes = deg_e95$external_gene_name
+path_res_e95 = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e105 = grab_deg_from_cuffdiff(gene_exp.diff_e105, class = "mmu")
+sig.genes = deg_e105$external_gene_name
+path_res_e105 = pathway_analysis(sig.genes, class = "mmu")
+
+list.info = list(path_res[[2]], path_res_chow[[2]], path_res_e95[[2]], path_res_e105[[2]])
+path.ids = check_pathway_name(pathway, class = "mmu")
+group.info = c("MCD","Chow","E9.5","E10.5")
+path.names = c("1st path","2nd path","3rd path","4th path")
+
+fig_path(path.ids, list.info, group.info, criterion = "percentage", path.names = path.names)
+fig_path(path.ids, list.info, group.info, criterion = "pval", path.names = path.names)
 }
