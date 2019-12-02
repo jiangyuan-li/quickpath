@@ -1,7 +1,15 @@
+## quickpath
+
 R package "quickpath" for quick pathway analysis
 
 Author: Jiangyuan Li
 
+Here is a [tutorial](https://rawcdn.githack.com/jiangyuan2li/quickpath/b5188c5ea4a08cf5ef04764cfd8b84036c70f8ae/vignettes/tutorial.html) which demonstrates the usage and convenience of this package.
+
+### Installation
+`devtools::install_github("jiangyuan2li/quickpath")`
+
+### Introduction.
 Pathway analysis is a common task in bioinformatics research. The data for pathway analysis come from high throughput biology, including high throughput sequencing data and microarray data. A comprehensive pathway analysis consists of extracting differential expression information, doing statistical inference, and making summary figures with publication quality. Such process need to be repeated many times, if you are working for a lab that produces data constantly. This package "quickpath" is targeting to automatic the process above and get the results, including figures quickly.
 
 There are two major methods, over-representation analysis and enrichment analysis. Here, we are focusing on over-representation analysis, specifically, hypergeometric distribution test (equivalently one-tailed version of Fisher's exact test) for RNA sequencing data.
@@ -12,4 +20,4 @@ The pathway information are usually stored in a data collection such as KEGG, wh
 
 Based on the results, the summary plots with publication quality are usually needed. We would rely on "ggplot2" to make figures about p values and percentages of differential expressed genes in some specific pathways.
 
-**Dependencies:** biomaRt, KEGGREST, parallel, ggplot2.
+**Dependencies:** biomaRt, parallel, ggplot2, xlsx.
