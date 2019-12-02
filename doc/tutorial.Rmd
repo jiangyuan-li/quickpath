@@ -1,0 +1,92 @@
+---
+title: "Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+## Introduction
+In this vignette, we will show the basic usage of this package and demonstrate the convenience to do over-representation pathway analysis. The sample data used here is from Rigor & Reproductibility Core at the Texas A&M Health Science Center, Institute of Biosciences & Technology.
+
+Originally, to perform pathway analysis, we need to query many online database to get pathway information, which is very time consuming. It also has stability issues that the database may not be accessed sometime. This package contains three common datasets locally (mouse, chicken, human pathway references). Although we may need to update them regularly, it saves a huge amount of time for each analysis. These data are stored in *data-raw/* and *data*. 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Grab DEGs and add annotation
+Loading package into the R environment.
+```{r, echo = T}
+library(quickpath)
+```
+Dataframe **gene_exp.diff** is the sample cuffdiff output. After reading the output of cuffdiff, we can easily get the DEGs (differential expressed genes) and add annotation to the genes. DEGs will be determined by the p value or q value with corresponding cutoff. If the parameter *out.name* is given, DEGs will be written into this file.
+```{r, message = F, echo = T}
+data(gene_exp.diff)
+print(dim(gene_exp.diff))
+head(gene_exp.diff, n = 5)
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cutoff = 0.05)
+print(dim(deg))
+head(deg[,c(1,4,8,9,10,11,12,13,15,16)],n = 5)
+```
+As you can see, we grab DEGs based p value and add *external_gene_name* and *description* based on *gene_id*.
+
+## Hypergeometric test
+After getting DEGs, we want to know the changes in each pathway. We choose to perform a hypergeometric test, which is equivalent to one-tailed version of Fisher's exact test. We utilize the R package *parallel* to speed up our analysis. This is the main function in our package. 
+
+```{r, echo = T}
+sig.genes = deg$external_gene_name
+path_res = pathway_analysis(sig.genes, class = "mmu")
+head(path_res[[1]])
+```
+
+Just to emphasize, all the analysis is not limitted to mouse data. Next is an example to process chicken data.
+```{r, echo = T}
+deg_egg = grab_deg_from_cuffdiff(gene_exp.diff_egg, class = "gga")
+sig.genes = deg_egg$external_gene_name
+path_res_egg = pathway_analysis(sig.genes, class = "gga")
+```
+
+After seeing the results of pathway analysis, experimental biologists usually have several interested pathways and they want to know DEGs in several specific pathways. This task can be done via *extract_degs_by_pathway*, which returns a list of dataframes. Each element in the list is correponding to one pathway. If *out.name* is specified, the output will be written into an *.xlsx* file, where each sheet is for one pathway. This functionality is based on the R package *xlsx*. 
+```{r, echo = T}
+pathway <- c("Purine metabolism", "PI3K-Akt signaling pathway", 
+             "AMPK signaling pathway", "Choline metabolism in cancer")
+deg.list = extract_degs_by_pathway(pathway, deg, class = "mmu")
+```
+
+## Generating figures
+When we want to compare different groups, it is easier to visulize it in a figure. Before that, let us prepare more data.
+```{r, echo = T}
+deg_chow = grab_deg_from_cuffdiff(gene_exp.diff_chow, class = "mmu")
+sig.genes = deg_chow$external_gene_name
+path_res_chow = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e105 = grab_deg_from_cuffdiff(gene_exp.diff_e105, class = "mmu")
+sig.genes = deg_e105$external_gene_name
+path_res_e105 = pathway_analysis(sig.genes, class = "mmu")
+
+deg_e95 = grab_deg_from_cuffdiff(gene_exp.diff_e95, class = "mmu")
+sig.genes = deg_e95$external_gene_name
+path_res_e95 = pathway_analysis(sig.genes, class = "mmu")
+```
+We can easily see the percentage of DEGs or p value for each pathway from different comparisons by utilizing the function *fig_path*. This is based on R package *ggplot2*. If *out.name* is specified, the figure will be saved into this file. You can also adjust several common parameters such as *height*, *width* and *res*.
+```{r, fig.height=6, fig.width=6, echo=T}
+list.info = list(path_res[[2]], path_res_chow[[2]], path_res_e95[[2]], path_res_e105[[2]])
+path.ids = check_pathway_name(pathway, class = "mmu")
+group.info = c("MCD","Chow","E9.5","E10.5")
+path.names = c("1st path","2nd path","3rd path","4th path")
+fig_path(path.ids, list.info, group.info, criterion = "percentage", path.names = path.names)
+fig_path(path.ids, list.info, group.info, criterion = "pval", path.names = path.names)
+```
+
+## Extension to other data type
+Although this package is designed mainly for RNA-seq data, it also has the capacity to deal with other data type, such as DNA methylation sequencing data. Most of the analysis above is based on DEGs and pathway analysis result. Here, for DNA methylation data, we can easily change to DMRs (differential methylated regions) and pathway analysis result. For example, we simply call one gene with at least one DMR is a methylated gene. Since the background gene sets for RNA-seq and DNA methylation-seq are different, we need to account for that. There is a variantion of pathway analysis called *pathway_analysis_meth* with an extra *total.genes* input, which has the capacity to do that. I will not use real examples below, since the dataset is too large to include in a package.
+```{r, message = F, echo = T}
+total.genes = mmu_genes_pathways$gene.symbol
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cutoff = 0.05)
+sig.genes = deg$external_gene_name
+meth_path_res = pathway_analysis_meth(sig.genes,total.genes, class = "mmu")
+```
+Other analysis are mainly based on the pathway analysis result, which follows from previous procedure.
