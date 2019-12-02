@@ -27,7 +27,7 @@ Dataframe **gene_exp.diff** is the sample cuffdiff output. After reading the out
 data(gene_exp.diff)
 print(dim(gene_exp.diff))
 head(gene_exp.diff, n = 5)
-deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cutoff = 0.05)
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cut.off = 0.05)
 print(dim(deg))
 head(deg[,c(1,4,8,9,10,11,12,13,15,16)],n = 5)
 ```
@@ -53,7 +53,7 @@ After seeing the results of pathway analysis, experimental biologists usually ha
 ```{r, echo = T}
 pathway <- c("Purine metabolism", "PI3K-Akt signaling pathway", 
              "AMPK signaling pathway", "Choline metabolism in cancer")
-deg.list = extract_degs_by_pathway(pathway, deg, class = "mmu")
+deg.list = extract_genes_by_pathway(pathway, deg, class = "mmu")
 ```
 
 ## Generating figures
@@ -72,7 +72,7 @@ sig.genes = deg_e95$external_gene_name
 path_res_e95 = pathway_analysis(sig.genes, class = "mmu")
 ```
 We can easily see the percentage of DEGs or p value for each pathway from different comparisons by utilizing the function *fig_path*. This is based on R package *ggplot2*. If *out.name* is specified, the figure will be saved into this file. You can also adjust several common parameters such as *height*, *width* and *res*.
-```{r, fig.height=6, fig.width=6, echo=T}
+```{r, fig.height=8, fig.width=8, echo=T}
 list.info = list(path_res[[2]], path_res_chow[[2]], path_res_e95[[2]], path_res_e105[[2]])
 path.ids = check_pathway_name(pathway, class = "mmu")
 group.info = c("MCD","Chow","E9.5","E10.5")
@@ -85,7 +85,7 @@ fig_path(path.ids, list.info, group.info, criterion = "pval", path.names = path.
 Although this package is designed mainly for RNA-seq data, it also has the capacity to deal with other data type, such as DNA methylation sequencing data. Most of the analysis above is based on DEGs and pathway analysis result. Here, for DNA methylation data, we can easily change to DMRs (differential methylated regions) and pathway analysis result. For example, we simply call one gene with at least one DMR is a methylated gene. Since the background gene sets for RNA-seq and DNA methylation-seq are different, we need to account for that. There is a variantion of pathway analysis called *pathway_analysis_meth* with an extra *total.genes* input, which has the capacity to do that. I will not use real examples below, since the dataset is too large to include in a package.
 ```{r, message = F, echo = T}
 total.genes = mmu_genes_pathways$gene.symbol
-deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cutoff = 0.05)
+deg = grab_deg_from_cuffdiff(gene_exp.diff, class = "mmu", criterion = "p_value", cut.off = 0.05)
 sig.genes = deg$external_gene_name
 meth_path_res = pathway_analysis_meth(sig.genes,total.genes, class = "mmu")
 ```

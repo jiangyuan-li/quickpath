@@ -11,7 +11,7 @@
 #'deg.list = extract_degs_by_pathway(pathway, deg, class = "mmu")
 #'@export
 
-extract_degs_by_pathway <- function(pathway, deg, class = c("mmu","hsa","gga"), out.name = NULL){
+extract_genes_by_pathway <- function(pathway, deg, class = c("mmu","hsa","gga"), out.name = NULL){
 
   # get number of pathways
   n = length(pathway)
