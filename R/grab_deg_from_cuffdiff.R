@@ -10,7 +10,7 @@
 #'deg = grab_deg_from_cuffdiff(gene_exp.diff)
 #'head(deg)
 #'@export
-grab_deg_from_cuffdiff <- function(gene_exp.diff, out.name = NULL, class = c("mmu","gga","hsa"), criterion = c("p_value","q_value"), cut.off = 0.05){
+grab_degs_from_cuffdiff <- function(gene_exp.diff, out.name = NULL, class = c("mmu","gga","hsa"), criterion = c("p_value","q_value"), cut.off = 0.05){
 
   # get DEGs based on criterion and cutoff
   deg <- gene_exp.diff[gene_exp.diff[,criterion] <= cut.off, ]
