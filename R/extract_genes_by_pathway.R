@@ -43,12 +43,12 @@ extract_genes_by_pathway <- function(pathway, deg, class = c("mmu","hsa","gga"),
     message("Writing the output to a xlsx file...")
     wb = xlsx::createWorkbook()
 
-    for (i in 1:length(pathway)){
+    for (i in 1:n){
 
       # writing each pathway into one sheet
       sheet = xlsx::createSheet(wb, pathway[i])
       print(path.ids[i])
-      xlsx::addDataFrame(out.deg, sheet=sheet, startRow =1, row.names=FALSE)
+      xlsx::addDataFrame(out.list[[i]], sheet=sheet, startRow =1, row.names=FALSE)
     }
 
     # save Workbook
