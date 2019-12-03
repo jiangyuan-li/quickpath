@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_genes_by_pathway.R
 \name{check_pathway_name}
 \alias{check_pathway_name}
-\title{Extract DEGs from pathways}
+\title{Check whether pathway names are valid}
 \usage{
 check_pathway_name(pathway, class = c("mmu", "hsa", "gga"))
 }
@@ -15,7 +15,7 @@ check_pathway_name(pathway, class = c("mmu", "hsa", "gga"))
 A vector of path IDs
 }
 \description{
-Extract DEGs from pathways
+Check whether pathway names are valid
 }
 \examples{
 Path IDs for each pathway

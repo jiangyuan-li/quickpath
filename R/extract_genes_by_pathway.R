@@ -64,7 +64,7 @@ extract_genes_by_pathway <- function(pathway, deg, class = c("mmu","hsa","gga"),
 ####################check pathway name and return path ids ##############
 #########################################################################
 
-#' Extract DEGs from pathways
+#' Check whether pathway names are valid
 #'
 #'@param pathway A vector contains interested pathwat names
 #'@param class Specify which type of gene

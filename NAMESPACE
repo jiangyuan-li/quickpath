@@ -3,6 +3,6 @@
 export(check_pathway_name)
 export(extract_genes_by_pathway)
 export(fig_path)
-export(grab_deg_from_cuffdiff)
+export(grab_degs_from_cuffdiff)
 export(pathway_analysis)
 export(pathway_analysis_meth)
