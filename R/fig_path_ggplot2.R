@@ -52,8 +52,9 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
 
     # grab data based criterion
     tmp.info = list.info[[i]]
-    tmp.dta = tmp.info[tmp.info$name %in% path.ids, c("path", criterion)]
-
+    tmp.dta = tmp.info[tmp.info$name %in% path.ids, c("name","path", criterion)]
+    tmp.dta = tmp.dta[match(path.ids, tmp.dta$name),]
+    tmp.dta = tmp.dta[,-1]
     if(is.null(path.names)){
       # prepare names on xlab
       tmp.dta$path = unlist(strsplit(tmp.dta$path," - M"))[seq(1,2*length(path.ids),2)]
@@ -64,10 +65,10 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
 
     # reformat numbers
     if(criterion == "percentage"){
-      tmp.dta[,2] = tmp.dta[,2] * 100
+      tmp.dta[,criterion] = tmp.dta[,criterion] * 100
     }
     else{
-      tmp.dta[,2] = -log(tmp.dta[,2])
+      tmp.dta[,criterion] = -log(tmp.dta[,criterion])
     }
 
     # assign group info
@@ -134,5 +135,4 @@ fig_path <- function(path.ids, list.info, group.info, criterion = c("pval","perc
     dev.off()
   }
 
-  # no return
 }
