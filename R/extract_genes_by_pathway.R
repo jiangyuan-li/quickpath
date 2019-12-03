@@ -8,7 +8,7 @@
 #'@examples
 #'pathway <- c("Purine metabolism", "PI3K-Akt signaling pathway", "AMPK signaling pathway", "Choline metabolism in cancer")
 #'deg = grab_deg_from_cuffdiff(gene_exp.diff)
-#'deg.list = extract_degs_by_pathway(pathway, deg, class = "mmu")
+#'deg.list = extract_genes_by_pathway(pathway, deg, class = "mmu")
 #'@export
 
 extract_genes_by_pathway <- function(pathway, deg, class = c("mmu","hsa","gga"), out.name = NULL){
