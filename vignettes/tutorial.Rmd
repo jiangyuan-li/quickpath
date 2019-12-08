@@ -44,6 +44,7 @@ head(path_res[[1]])
 
 Just to emphasize, all the analysis is not limitted to mouse data. Next is an example to process chicken data.
 ```{r, echo = T}
+data(gene_exp.diff_egg)
 deg_egg = grab_degs_from_cuffdiff(gene_exp.diff_egg, class = "gga")
 sig.genes = deg_egg$external_gene_name
 path_res_egg = pathway_analysis(sig.genes, class = "gga")
@@ -59,18 +60,21 @@ deg.list = extract_genes_by_pathway(pathway, deg, class = "mmu")
 ## Generating figures
 When we want to compare different groups, it is easier to visulize it in a figure. Before that, let us prepare more data.
 ```{r, message = F, echo = T}
+data(gene_exp.diff_chow)
 deg_chow = grab_degs_from_cuffdiff(gene_exp.diff_chow, class = "mmu")
 sig.genes = deg_chow$external_gene_name
 path_res_chow = pathway_analysis(sig.genes, class = "mmu")
 ```
 
 ```{r, message = F, echo = T}
+data(gene_exp.diff_e105)
 deg_e105 = grab_degs_from_cuffdiff(gene_exp.diff_e105, class = "mmu")
 sig.genes = deg_e105$external_gene_name
 path_res_e105 = pathway_analysis(sig.genes, class = "mmu")
 ```
 
 ```{r, message = F, echo = T}
+data(gene_exp.diff_e95)
 deg_e95 = grab_degs_from_cuffdiff(gene_exp.diff_e95, class = "mmu")
 sig.genes = deg_e95$external_gene_name
 path_res_e95 = pathway_analysis(sig.genes, class = "mmu")

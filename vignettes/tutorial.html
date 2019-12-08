@@ -390,12 +390,13 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb3-25" data-line-number="25"><span class="co">#&gt; 10 0.068485797  0.1400000</span></a>
 <a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#&gt; 12 0.005610764  0.3157895</span></a></code></pre></div>
 <p>Just to emphasize, all the analysis is not limitted to mouse data. Next is an example to process chicken data.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">deg_egg =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_egg, <span class="dt">class =</span> <span class="st">&quot;gga&quot;</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="co">#&gt; Cache found</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">sig.genes =<span class="st"> </span>deg_egg<span class="op">$</span>external_gene_name</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">path_res_egg =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;gga&quot;</span>)</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; [1] &quot;sig genes in pathway: 119/4701&quot;</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">data</span>(gene_exp.diff_egg)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">deg_egg =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_egg, <span class="dt">class =</span> <span class="st">&quot;gga&quot;</span>)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; Cache found</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">sig.genes =<span class="st"> </span>deg_egg<span class="op">$</span>external_gene_name</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">path_res_egg =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;gga&quot;</span>)</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] &quot;sig genes in pathway: 119/4701&quot;</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
 <p>After seeing the results of pathway analysis, experimental biologists usually have several interested pathways and they want to know DEGs in several specific pathways. This task can be done via <em>extract_degs_by_pathway</em>, which returns a list of dataframes. Each element in the list is correponding to one pathway. If <em>out.name</em> is specified, the output will be written into an <em>.xlsx</em> file, where each sheet is for one pathway. This functionality is based on the R package <em>xlsx</em>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">pathway &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Purine metabolism&quot;</span>, <span class="st">&quot;PI3K-Akt signaling pathway&quot;</span>, </a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">             <span class="st">&quot;AMPK signaling pathway&quot;</span>, <span class="st">&quot;Choline metabolism in cancer&quot;</span>)</a>
@@ -422,21 +423,24 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="generating-figures" class="section level2">
 <h2>Generating figures</h2>
 <p>When we want to compare different groups, it is easier to visulize it in a figure. Before that, let us prepare more data.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">deg_chow =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_chow, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2">sig.genes =<span class="st"> </span>deg_chow<span class="op">$</span>external_gene_name</a>
-<a class="sourceLine" id="cb6-3" data-line-number="3">path_res_chow =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt; [1] &quot;sig genes in pathway: 229/8558&quot;</span></a>
-<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">deg_e105 =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_e105, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2">sig.genes =<span class="st"> </span>deg_e105<span class="op">$</span>external_gene_name</a>
-<a class="sourceLine" id="cb7-3" data-line-number="3">path_res_e105 =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt; [1] &quot;sig genes in pathway: 861/8558&quot;</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">deg_e95 =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_e95, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2">sig.genes =<span class="st"> </span>deg_e95<span class="op">$</span>external_gene_name</a>
-<a class="sourceLine" id="cb8-3" data-line-number="3">path_res_e95 =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
-<a class="sourceLine" id="cb8-4" data-line-number="4"><span class="co">#&gt; [1] &quot;sig genes in pathway: 344/8558&quot;</span></a>
-<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">data</span>(gene_exp.diff_chow)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">deg_chow =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_chow, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">sig.genes =<span class="st"> </span>deg_chow<span class="op">$</span>external_gene_name</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">path_res_chow =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt; [1] &quot;sig genes in pathway: 229/8558&quot;</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">data</span>(gene_exp.diff_e105)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2">deg_e105 =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_e105, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">sig.genes =<span class="st"> </span>deg_e105<span class="op">$</span>external_gene_name</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4">path_res_e105 =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; [1] &quot;sig genes in pathway: 861/8558&quot;</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">data</span>(gene_exp.diff_e95)</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2">deg_e95 =<span class="st"> </span><span class="kw">grab_degs_from_cuffdiff</span>(gene_exp.diff_e95, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">sig.genes =<span class="st"> </span>deg_e95<span class="op">$</span>external_gene_name</a>
+<a class="sourceLine" id="cb8-4" data-line-number="4">path_res_e95 =<span class="st"> </span><span class="kw">pathway_analysis</span>(sig.genes, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
+<a class="sourceLine" id="cb8-5" data-line-number="5"><span class="co">#&gt; [1] &quot;sig genes in pathway: 344/8558&quot;</span></a>
+<a class="sourceLine" id="cb8-6" data-line-number="6"><span class="co">#&gt; [1] &quot;Inference part is Done.&quot;</span></a></code></pre></div>
 <p>We can easily see the percentage of DEGs or p value for each pathway from different comparisons by utilizing the function <em>fig_path</em>. This is based on R package <em>ggplot2</em>. If <em>out.name</em> is specified, the figure will be saved into this file. You can also adjust several common parameters such as <em>height</em>, <em>width</em> and <em>res</em>.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">list.info =<span class="st"> </span><span class="kw">list</span>(path_res[[<span class="dv">2</span>]], path_res_chow[[<span class="dv">2</span>]], path_res_e95[[<span class="dv">2</span>]], path_res_e105[[<span class="dv">2</span>]])</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">path.ids =<span class="st"> </span><span class="kw">check_pathway_name</span>(pathway, <span class="dt">class =</span> <span class="st">&quot;mmu&quot;</span>)</a>
