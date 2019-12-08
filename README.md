@@ -4,7 +4,7 @@ R package "quickpath" for quick pathway analysis
 
 Author: Jiangyuan Li
 
-Here is a [tutorial](https://rawcdn.githack.com/jiangyuan2li/quickpath/b5188c5ea4a08cf5ef04764cfd8b84036c70f8ae/vignettes/tutorial.html), which demonstrates the usage and convenience of this package.
+Here is a [tutorial](http://htmlpreview.github.io/?https://github.com/jiangyuan2li/quickpath/blob/master/doc/tutorial.html), which demonstrates the usage and convenience of this package.
 
 Description
 -------
